@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Page Title</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: green;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header img {
+            width: 100px; /* Set the size as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .profile-button {
+            background-color: white;
+            color: green;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .left-section {
+            width: 45%;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .right-section {
+            width: 45%;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        /* Additional styling for lists */
+        .code-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+  <script>
+    function pickOption(option) {
+      if (option === 'developer') {
+        var password = prompt('Please enter the password for developer access:');
+        if (password === 'BBM') {
+          document.getElementById('userInterface').style.display = 'none';
+          document.getElementById('developerInterface').style.display = 'block';
+        } else {
+          alert('Incorrect password. Access denied.');
+        }
+      } else if (option === 'user') {
+        var userEmail = prompt('Please enter your email:');
+        if (userEmail !== null && userEmail !== '') {
+          localStorage.setItem('userEmail', userEmail);
+          showProfile();
+        } else {
+          alert('Please enter a valid email.');
+        }
+      } else {
+        alert('Invalid option.');
+      }
+    }
+
+    function generateCode() {
+      var code = '';
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (var i = 0; i < 5; i++) {
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      var activeCodes = document.getElementById('activeCodes');
+      activeCodes.innerHTML += '<li>' + code + '</li>';
+    }
+
+        function redeemCode() {
+            var inputCode = document.getElementById('codeInput').value;
+            var activeCodes = document.getElementById('activeCodes');
+            var inactiveCodes = document.getElementById('inactiveCodes');
+            var userStars = document.getElementById('userStars');
+            var redeemButton = document.querySelector('.left-section button');
+
+            if (inputCode !== '') {
+                var codeFound = false;
+                var codeList = activeCodes.getElementsByTagName('li');
+                for (var i = 0; i < codeList.length; i++) {
+                    if (codeList[i].innerText === inputCode) {
+                        codeFound = true;
+                        // Move code from active to inactive list
+                        inactiveCodes.appendChild(codeList[i]);
+
+                        // Increase stars by 1
+                        userStars.innerText = parseInt(userStars.innerText, 10) + 1;
+
+                        // Show thank you message
+                        var thankYouMsg = document.getElementById('thankYouMsg');
+                        thankYouMsg.style.display = 'block';
+
+                        // Hide thank you message after 2 seconds
+                        setTimeout(function() {
+                            thankYouMsg.style.display = 'none';
+                            redeemButton.style.display = 'inline-block'; // Re-display redeem button
+                            document.getElementById('codeInput').value = ''; // Clear input
+                        }, 2000);
+
+                        // Hide redeem button temporarily
+                        redeemButton.style.display = 'none';
+                        break;
+                    }
+                }
+
+                if (!codeFound) {
+                    alert('Invalid code or already redeemed.');
+                }
+            } else {
+                alert('Please enter a code.');
+            }
+        }
+
+        function redeemAgain() {
+            var redeemButton = document.querySelector('.left-section button');
+            var thankYouMsg = document.getElementById('thankYouMsg');
+
+            redeemButton.style.display = 'inline-block'; // Re-display redeem button
+            thankYouMsg.style.display = 'none';
+        }
+
+  function showProfile() {
+        var userEmail = localStorage.getItem('userEmail');
+        var userStars = document.getElementById('userStars');
+        var emailSpan = document.getElementById('userEmail');
+
+        if (userEmail !== null) {
+            emailSpan.innerText = userEmail;
+            userStars.innerText = '0'; // Reset user stars to 0
+        } else {
+            alert('User not found.');
+            window.location.href = 'index.html'; // Redirect to login page if user not found
+        }
+    }
+
+    window.onload = function() {
+        showProfile(); // Call showProfile when the page loads
+    };
+
+    function redeemAgain() {
+      document.getElementById('thankYouMsg').style.display = 'none';
+    }
+  </script>
+</head>
+<body>
+
+    <header>
+        <!-- Logo in the top left -->
+        <img src="logo.jpg" alt="Logo">
+
+        <!-- Profile button on the top right -->
+        <button class="profile-button">Profile</button>
+    </header>
+
+    <div class="container">
+        <div class="left-section">
+            <!-- Left Section Content -->
+          <h2>User Profile</h2>
+            <p>Email: <span id="userEmail"></span></p>
+            <p>Stars: <span id="userStars">0</span></p>
+            <input type="text" id="codeInput" placeholder="Enter code">
+            <button onclick="redeemCode()">Redeem Code</button>
+            <div id="thankYouMsg" style="display: none;">
+                <p>Thank you for redeeming the code! You earned 1 star.</p>
+                <button onclick="redeemAgain()">Redeem Another</button>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <!-- Right Section Content -->
+            <h2>Generate Codes</h2>
+    <button onclick="generateCode()">Generate Code</button>
+    <h3>Active Codes</h3>
+    <ul id="activeCodes">
+      <!-- List of active codes will appear here -->
+    </ul>
+    <h3>Inactive Codes</h3>
+    <ul id="inactiveCodes">
+      <!-- List of inactive codes will appear here -->
+    </ul>
+        </div>
+    </div>
+
+    <!-- Rest of your content goes here -->
+
+</body>
+</html>
